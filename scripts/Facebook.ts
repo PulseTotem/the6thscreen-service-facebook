@@ -49,5 +49,5 @@ var _FacebookListeningPort : number = process.env.PORT || 6006;
  */
 var _FacebookArguments : Array<string> = process.argv;
 
-var serverInstance = new Flickr(_FacebookListeningPort, _FacebookArguments);
+var serverInstance = new Facebook(_FacebookListeningPort, _FacebookArguments);
 serverInstance.run();

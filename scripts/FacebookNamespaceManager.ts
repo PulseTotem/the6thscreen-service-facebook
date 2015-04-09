@@ -2,7 +2,6 @@
  * @author Simon Urli <simon@the6thscreen.fr>
  */
 
-/// <reference path="../libsdef/datejs.d.ts" />
 /// <reference path="../t6s-core/core-backend/libsdef/node-uuid.d.ts" />
 
 /// <reference path="../t6s-core/core-backend/scripts/Logger.ts" />
@@ -64,7 +63,9 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 
 					var pic : Picture = new Picture(photo.id, 0, new Date(photo.created_time), null, 10000);
 					//pic.setDescription(photo.description._content);
-					pic.setTitle(photo.name);
+					if (photo.name) {
+						pic.setTitle(photo.name);
+					}
 
 					var original = new PictureURL(photo.id+"_original");
 					original.setURL(photo.source);
@@ -76,7 +77,7 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 					var images = photo.images;
 
 					for (var j = 0; j < images.length; j++) {
-						var currentPic = images[j];
+						var currentPic : any = images[j];
 
 						var picUrl = new PictureURL(photo.id+"_large");
 						picUrl.setURL(currentPic.source);
@@ -103,7 +104,7 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 			};
 
 
-			var userPhoto = '/v2.3/me?fields=photos.limit('+params.Limit+')';
+			var userPhoto = 'https://graph.facebook.com/me?fields=photos.limit('+params.Limit+')';
 			oauthActions.get(userPhoto, successSearch, fail);
 		};
 
