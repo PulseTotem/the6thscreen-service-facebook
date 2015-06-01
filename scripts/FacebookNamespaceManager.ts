@@ -34,7 +34,7 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 		this.addListenerToSocket('PicturesFromAlbum', this.retrievePicturesFromAlbum);
 	}
 
-	extractDataFromPhotoResult(information : any) : PictureAlbum {
+	extractDataFromPhotoResult(information : any, params : any) : PictureAlbum {
 		var pictureAlbum : PictureAlbum = new PictureAlbum();
 		var result = information.photos;
 		var listPhotos = result.data;
@@ -45,7 +45,7 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 		for (var i = 0; i < listPhotos.length; i++) {
 			var photo = listPhotos[i];
 
-			var pic : Picture = new Picture(photo.id, 0, new Date(photo.created_time), null, 10000);
+			var pic : Picture = new Picture(photo.id, 0, new Date(photo.created_time), null, parseInt(params.InfoDuration));
 			//pic.setDescription(photo.description._content);
 			if (photo.name) {
 				pic.setTitle(photo.name);
@@ -67,8 +67,6 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 			pictureAlbum.addPicture(pic);
 		}
 
-		Logger.debug("Send PictureAlbum to client : ");
-		Logger.debug(pictureAlbum);
 		return pictureAlbum;
 	}
 
@@ -94,9 +92,6 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 			self = this;
 		}
 
-		Logger.debug("PicturesFromLoggedUser Action with params :");
-		Logger.debug(params);
-
 		var fail = function(error) {
 			if(error) {
 				Logger.error(error);
@@ -105,9 +100,8 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 
 		var success = function(oauthActions) {
 			var successSearch = function (information) {
-				console.log("Obtained informations : ");
-				console.log(JSON.stringify(information));
-				var pictureAlbum : PictureAlbum = self.extractDataFromPhotoResult(information);
+				var pictureAlbum : PictureAlbum = self.extractDataFromPhotoResult(information, params);
+				pictureAlbum.setDurationToDisplay(parseInt(params.InfoDuration) * pictureAlbum.getPictures().length);
 				self.sendNewInfoToClient(pictureAlbum);
 			};
 
@@ -124,9 +118,6 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 			self = this;
 		}
 
-		Logger.debug("PicturesFromLoggedUser Action with params :");
-		Logger.debug(params);
-
 		var fail = function(error) {
 			if(error) {
 				Logger.error(error);
@@ -135,9 +126,8 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 
 		var success = function(oauthActions) {
 			var successSearch = function (information) {
-				console.log("Obtained informations : ");
-				console.log(JSON.stringify(information));
-				var pictureAlbum : PictureAlbum = self.extractDataFromPhotoResult(information);
+				var pictureAlbum : PictureAlbum = self.extractDataFromPhotoResult(information, params);
+				pictureAlbum.setDurationToDisplay(parseInt(params.InfoDuration) * pictureAlbum.getPictures().length);
 				self.sendNewInfoToClient(pictureAlbum);
 			};
 
@@ -154,9 +144,6 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 			self = this;
 		}
 
-		Logger.debug("PicturesFromLoggedUser Action with params :");
-		Logger.debug(params);
-
 		var fail = function(error) {
 			if(error) {
 				Logger.error(error);
@@ -165,9 +152,8 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 
 		var success = function(oauthActions) {
 			var successSearch = function (information) {
-				console.log("Obtained informations : ");
-				console.log(JSON.stringify(information));
-				var pictureAlbum : PictureAlbum = self.extractDataFromPhotoResult(information);
+				var pictureAlbum : PictureAlbum = self.extractDataFromPhotoResult(information, params);
+				pictureAlbum.setDurationToDisplay(parseInt(params.InfoDuration) * pictureAlbum.getPictures().length);
 				self.sendNewInfoToClient(pictureAlbum);
 			};
 
