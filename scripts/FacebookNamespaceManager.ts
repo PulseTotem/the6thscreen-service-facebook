@@ -21,8 +21,8 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 	 */
 	constructor(socket : any) {
 		super(socket);
-		this.addListenerToSocket('PicturesFromLoggedUser', this.retrievePicturesFromLoggedUser);
-		this.addListenerToSocket('PicturesFromPage', this.retrievePicturesFromPage);
-		this.addListenerToSocket('PicturesFromAlbum', this.retrievePicturesFromAlbum);
+		this.addListenerToSocket('PicturesFromLoggedUser', function (params, self) { new PicturesFromLoggedUser(params, self); });
+		this.addListenerToSocket('PicturesFromPage', function (params, self) { new PicturesFromPage(params, self); });
+		this.addListenerToSocket('PicturesFromAlbum', function (params, self) { new PicturesFromAlbum(params, self); });
 	}
 }

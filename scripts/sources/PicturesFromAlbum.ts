@@ -6,7 +6,7 @@
 /// <reference path="../../t6s-core/core-backend/scripts/server/SourceItf.ts" />
 /// <reference path="../FacebookUtils.ts" />
 
-class PicturesFromLoggedUser extends SourceItf {
+class PicturesFromAlbum extends SourceItf {
 
 	constructor(params : any, facebookNamespaceManager : FacebookNamespaceManager) {
 		super(params, facebookNamespaceManager);
