@@ -8,7 +8,7 @@
 /// <reference path="../../scripts/sources/PicturesFromPage.ts" />
 
 var assert = require("assert");
-var sinon : Sinon.SinonStatic = require("sinon");
+var sinon : SinonStatic = require("sinon");
 
 describe('PicturesFromPage', function() {
 	describe('#constructor', function () {
