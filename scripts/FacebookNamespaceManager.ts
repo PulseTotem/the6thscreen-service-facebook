@@ -5,19 +5,12 @@
 /// <reference path="../t6s-core/core-backend/libsdef/node-uuid.d.ts" />
 
 /// <reference path="../t6s-core/core-backend/scripts/Logger.ts" />
-
 /// <reference path="../t6s-core/core-backend/scripts/server/SourceNamespaceManager.ts" />
 
-/// <reference path="../t6s-core/core-backend/t6s-core/core/scripts/infotype/PictureAlbum.ts" />
-/// <reference path="../t6s-core/core-backend/t6s-core/core/scripts/infotype/Picture.ts" />
-/// <reference path="../t6s-core/core-backend/t6s-core/core/scripts/infotype/PictureURL.ts" />
-
-var datejs : any = require('datejs');
-
-var DateJS : any = <any>Date;
-var uuid : any = require('node-uuid');
-
-var util = require('util');
+/// <reference path="./sources/PicturesFromAlbum.ts" />
+/// <reference path="./sources/PicturesFromLoggedUser.ts" />
+/// <reference path="./sources/PicturesFromPage.ts" />
+/// <reference path="./sources/PageFeed.ts" />
 
 class FacebookNamespaceManager extends SourceNamespaceManager {
 
@@ -29,139 +22,9 @@ class FacebookNamespaceManager extends SourceNamespaceManager {
 	 */
 	constructor(socket : any) {
 		super(socket);
-		this.addListenerToSocket('PicturesFromLoggedUser', this.retrievePicturesFromLoggedUser);
-		this.addListenerToSocket('PicturesFromPage', this.retrievePicturesFromPage);
-		this.addListenerToSocket('PicturesFromAlbum', this.retrievePicturesFromAlbum);
-	}
-
-	extractDataFromPhotoResult(information : any, params : any) : PictureAlbum {
-		var pictureAlbum : PictureAlbum = new PictureAlbum();
-		var result = information.photos;
-		var listPhotos = result.data;
-
-		pictureAlbum.setId(uuid.v1());
-		pictureAlbum.setPriority(0);
-
-		for (var i = 0; i < listPhotos.length; i++) {
-			var photo = listPhotos[i];
-
-			var pic : Picture = new Picture(photo.id, 0, new Date(photo.created_time), null, parseInt(params.InfoDuration));
-			//pic.setDescription(photo.description._content);
-			if (photo.name) {
-				pic.setTitle(photo.name);
-			}
-
-			var original = new PictureURL(photo.id+"_original");
-			original.setURL(photo.source);
-			original.setHeight(photo.height);
-			original.setWidth(photo.width);
-
-			pic.setOriginal(original);
-
-			var images = photo.images;
-
-			for (var j = 0; j < images.length; j++) {
-				var currentPic : any = images[j];
-				this.extractPhotoResolutions(pic, currentPic);
-			}
-			pictureAlbum.addPicture(pic);
-		}
-
-		return pictureAlbum;
-	}
-
-	extractPhotoResolutions(pictureObject : Picture, pictureDatas : any) {
-		var picUrl = new PictureURL(uuid.v1());
-		picUrl.setURL(pictureDatas.source);
-		picUrl.setHeight(pictureDatas.height);
-		picUrl.setWidth(pictureDatas.width);
-
-		if (pictureDatas.width >= 800) {
-			pictureObject.setLarge(picUrl);
-		} else if (pictureDatas.width < 800 && pictureDatas.width >= 500) {
-			pictureObject.setMedium(picUrl);
-		}  else if (pictureDatas.width < 500 && pictureDatas.width >= 200) {
-			pictureObject.setSmall(picUrl);
-		} else {
-			pictureObject.setThumb(picUrl);
-		}
-	}
-
-	retrievePicturesFromLoggedUser(params : any, self : FacebookNamespaceManager = null) {
-		if (self == null) {
-			self = this;
-		}
-
-		var fail = function(error) {
-			if(error) {
-				Logger.error(error);
-			}
-		};
-
-		var success = function(oauthActions) {
-			var successSearch = function (information) {
-				var pictureAlbum : PictureAlbum = self.extractDataFromPhotoResult(information, params);
-				pictureAlbum.setDurationToDisplay(parseInt(params.InfoDuration) * pictureAlbum.getPictures().length);
-				self.sendNewInfoToClient(pictureAlbum);
-			};
-
-
-			var userPhoto = 'https://graph.facebook.com/me?fields=photos.limit('+params.Limit+')';
-			oauthActions.get(userPhoto, successSearch, fail);
-		};
-
-		self.manageOAuth('facebook', params.oauthKey, success, fail);
-	}
-
-	retrievePicturesFromPage(params : any, self : FacebookNamespaceManager = null) {
-		if (self == null) {
-			self = this;
-		}
-
-		var fail = function(error) {
-			if(error) {
-				Logger.error(error);
-			}
-		};
-
-		var success = function(oauthActions) {
-			var successSearch = function (information) {
-				var pictureAlbum : PictureAlbum = self.extractDataFromPhotoResult(information, params);
-				pictureAlbum.setDurationToDisplay(parseInt(params.InfoDuration) * pictureAlbum.getPictures().length);
-				self.sendNewInfoToClient(pictureAlbum);
-			};
-
-
-			var userPhoto = 'https://graph.facebook.com/'+params.PageName+'?fields=photos.limit('+params.Limit+')';
-			oauthActions.get(userPhoto, successSearch, fail);
-		};
-
-		self.manageOAuth('facebook', params.oauthKey, success, fail);
-	}
-
-	retrievePicturesFromAlbum(params : any, self : FacebookNamespaceManager = null) {
-		if (self == null) {
-			self = this;
-		}
-
-		var fail = function(error) {
-			if(error) {
-				Logger.error(error);
-			}
-		};
-
-		var success = function(oauthActions) {
-			var successSearch = function (information) {
-				var pictureAlbum : PictureAlbum = self.extractDataFromPhotoResult(information, params);
-				pictureAlbum.setDurationToDisplay(parseInt(params.InfoDuration) * pictureAlbum.getPictures().length);
-				self.sendNewInfoToClient(pictureAlbum);
-			};
-
-
-			var userPhoto = 'https://graph.facebook.com/'+params.AlbumID+'?fields=photos.limit('+params.Limit+')';
-			oauthActions.get(userPhoto, successSearch, fail);
-		};
-
-		self.manageOAuth('facebook', params.oauthKey, success, fail);
+		this.addListenerToSocket('PicturesFromLoggedUser', function (params, self) { new PicturesFromLoggedUser(params, self); });
+		this.addListenerToSocket('PicturesFromPage', function (params, self) { new PicturesFromPage(params, self); });
+		this.addListenerToSocket('PicturesFromAlbum', function (params, self) { new PicturesFromAlbum(params, self); });
+		this.addListenerToSocket('PageFeed', function (params, self) { new PageFeed(params, self); });
 	}
 }
